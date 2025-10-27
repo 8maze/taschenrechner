@@ -1,6 +1,7 @@
 
+let v1 = 1234;
 
-
+console.log(v1);
 
 
 $(document).on('click','#btn_plus','#btn_minus', '#btn_times','#btn_divided_by', function(){
