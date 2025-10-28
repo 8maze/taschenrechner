@@ -1,49 +1,60 @@
 <?php
-var_dump($_POST);
+// Setze den Header, um sicherzustellen, dass die Antwort als reiner Text gesendet wird
+header('Content-Type: text/plain');
 
-// Prüfen, ob POST-Werte gesetzt sind
+// Prüfen, ob alle notwendigen POST-Werte gesetzt sind
 if (isset($_POST['v1']) && isset($_POST['v2']) && isset($_POST['operator'])) {
 
     $v1 = $_POST['v1'];
     $v2 = $_POST['v2'];
     $operator = $_POST['operator'];
 
-    // Sicherstellen, dass es gültige Zahlen sind
+    // Serverseitige Validierung: Sicherstellen, dass es gültige Zahlen sind
     if (!is_numeric($v1) || !is_numeric($v2)) {
-        echo "Ungültige Eingabe: keine Zahl";
+        http_response_code(400); // Bad Request
+        echo "Ungültige Eingabe: Es wurden keine gültigen Zahlen übermittelt.";
         exit;
     }
 
-$v1 = floatval($v1);
-$v2 = floatval($v2);
+    // Konvertiere zu Gleitkommazahlen (Floats) für die Berechnung
+    $num1 = floatval($v1);
+    $num2 = floatval($v2);
 
     $result = null;
 
+    // Berechnung basierend auf dem Operator
     switch ($operator) {
         case '+':
-            $result = $v1 + $v2;
+            $result = $num1 + $num2;
             break;
         case '-':
-            $result = $v1 - $v2;
+            $result = $num1 - $num2;
             break;
         case '*':
-            $result = $v1 * $v2;
+            $result = $num1 * $num2;
             break;
         case '/':
-            if ($v2 != 0) {
-                $result = $v1 / $v2;
+            if ($num2 != 0) {
+                $result = $num1 / $num2;
             } else {
-                $result = "Fehler: Division durch 0";
+                // Fehler bei Division durch Null
+                $result = "Fehler: Division durch 0 ist nicht erlaubt.";
+                http_response_code(400); // Bad Request
             }
             break;
         default:
-            $result = "Unbekannter Operator";
+            // Unbekannter Operator
+            $result = "Unbekannter Operator.";
+            http_response_code(400); // Bad Request
     }
 
+    // Ausgabe des Ergebnisses (wird als Text an den Client gesendet)
     echo $result;
 
 } else {
-    echo "Ungültige Eingabe: POST fehlt";
+    // Wenn POST-Daten fehlen
+    http_response_code(400); // Bad Request
+    echo "Fehler: Es fehlen notwendige Daten für die Berechnung.";
 }
 ?>
 
